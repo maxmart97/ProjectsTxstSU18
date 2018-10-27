@@ -1,0 +1,70 @@
+--PART II SCRIPT BEGIN
+
+--Question 1
+CREATE TABLE Employee
+	(EmpID INT NOT NULL PRIMARY KEY,
+	EmpFName VARCHAR(50) NOT NULL,
+	EmpLName VARCHAR(50) NOT NULL,
+	EmpMName VARCHAR(50) NULL,
+	EmpStAddress VARCHAR(50) NOT NULL,
+	EmpCity VARCHAR(20) NOT NULL,
+	EmpState CHAR(2) NOT NULL,
+	EmpZipCode VARCHAR(10) NOT NULL,
+	EmpAreaCode CHAR(3) NOT NULL,
+	EmpPhoneNumber CHAR(8) NOT NULL,  --This is assuming the format is 000-0000
+	EmpStartDate DATE NOT NULL,
+	EmpEndDate DATE NULL,
+	EmpSalary MONEY NOT NULL);
+
+GO
+	
+INSERT INTO Employee
+	VALUES(1, 'John', 'Doe', 'H', '123 Cool Street', 'San Marcos', 'TX', '78666', '512', '111-1111', '01/01/2018', NULL, 75000.0000);
+
+INSERT INTO Employee
+	Values(2, 'Jill', 'Smith', 'M', '456 Kewl Avenue', 'San Marcos', 'TX', '78666', '830', '222-2222', '02/02/2018', '06/01/2018', 100000.0000);
+
+GO
+
+--Question 2
+ALTER TABLE Project
+ADD ManagerID INT NULL;
+
+ALTER TABLE Project
+ADD FOREIGN KEY(ManagerID) REFERENCES Employee(EmpID);
+
+GO
+
+--Question 3
+UPDATE Project
+SET ManagerID = 1
+WHERE ProjectID = 1;
+
+GO
+
+--Question 4
+UPDATE Employee
+SET EmpSalary = EmpSalary * 1.1;
+
+GO
+
+--Question 5
+CREATE INDEX IX_WorkOrder
+ON WorkOrder(ProjectID);
+
+GO
+
+--Question 6
+DELETE FROM Employee
+WHERE EmpID = 2;
+
+GO
+
+--Question 7
+SELECT ProjectID, ProjectName, ProjectDesc, ProjectCompletionDate, ProjectContractValue, CustName
+FROM Project JOIN Customer
+ON Project.CustID = Customer.CustID;
+
+GO
+
+--PART II SCRIPT END

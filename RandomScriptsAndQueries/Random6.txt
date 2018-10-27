@@ -1,0 +1,78 @@
+
+
+--Question 1
+SELECT ItemID, Description, QuantityOnHand, ListPrice
+FROM Merchandise
+WHERE Category = 'Fish' AND QuantityOnHand > 25 AND ListPrice >= 15.00
+ORDER BY ListPrice DESC;
+
+--Question 2
+SELECT EmployeeID, FirstName + ' ' + LastName AS EmployeeName, Title, City, State, DateHired
+FROM Employee JOIN City
+ON Employee.CityID = City.CityID
+WHERE DateHired > '02/15/2007' AND Title = 'Animal Friend'
+ORDER BY LastName, FirstName;
+
+--Question 3
+SELECT CustomerID, FirstName + ' ' + LastName AS CustomerName, City, State
+FROM Customer JOIN City
+ON Customer.CityID = City.CityID
+WHERE State = 'NC' OR State = 'TX'
+ORDER BY LastName, FirstName;
+
+--Question 4
+SELECT TOP 1 WITH TIES Animal.AnimalID, Breed, Category, Gender, ListPrice, SalePrice
+FROM Animal 
+	JOIN SaleAnimal 
+		ON Animal.AnimalID = SaleAnimal.AnimalID 
+	JOIN Sale
+		ON SaleAnimal.SaleID = Sale.SaleID
+WHERE Category = 'Bird' AND
+	SaleDate BETWEEN '01/01/2007' AND '06/30/2007 23:59:59.59'
+ORDER BY SalePrice DESC;
+
+--Question 5
+SELECT TOP 1 WITH TIES Category, Breed, (SUM(SalePrice) + Sum(SalesTax)) AS TotalSales, AVG(SalePrice) AS AverageSalePrice
+FROM Animal 
+	JOIN SaleAnimal 
+		ON Animal.AnimalID = SaleAnimal.AnimalID
+	JOIN Sale
+		ON SaleAnimal.SaleID = Sale.SaleID
+WHERE Category = 'Dog' AND
+	SaleDate BETWEEN '01/01/2007' AND '06/30/2007 23:59:59.59'
+GROUP BY Category, Breed
+ORDER BY TotalSales DESC;
+
+--Question 6
+SELECT Customer.CustomerID, FirstName + ' ' + LastName AS CustomerName, COUNT(SaleAnimal.SaleID) AS NumberPurchased
+FROM Customer
+	JOIN Sale
+		ON Customer.CustomerID = Sale.CustomerID
+	JOIN SaleAnimal
+		ON Sale.SaleID = SaleAnimal.SaleID
+WHERE SaleDate BETWEEN '01/01/2007' AND '06/30/2007 23:59:59.59'
+GROUP BY Customer.CustomerID, FirstName + ' ' + LastName
+HAVING COUNT(SaleAnimal.SaleID) >= 3
+ORDER BY NumberPurchased DESC;
+
+--Question 7
+SELECT Animal.AnimalID, Category, Breed, Gender, SalePrice
+FROM Animal JOIN SaleAnimal
+ON Animal.AnimalID = SaleAnimal.AnimalID
+WHERE Category = 'Cat'
+AND SalePrice > 
+	(Select AVG(SalePrice)
+	FROM SaleAnimal)
+ORDER BY SalePrice DESC;
+
+GO
+
+--Question 7
+SELECT Animal.AnimalID, Category, Breed, Gender, SalePrice
+FROM Animal JOIN SaleAnimal
+ON Animal.AnimalID = SaleAnimal.AnimalID
+WHERE Category = 'Cat'
+AND SalePrice > 
+	(Select AVG(SalePrice)
+	FROM SaleAnimal)
+ORDER BY SalePrice DESC;

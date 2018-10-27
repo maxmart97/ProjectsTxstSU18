@@ -1,0 +1,22 @@
+--Question 4
+SELECT TOP 1 WITH TIES Animal.AnimalID, Breed, Category, Gender, ListPrice, SalePrice
+FROM Animal 
+	JOIN SaleAnimal 
+		ON Animal.AnimalID = SaleAnimal.AnimalID 
+	JOIN Sale
+		ON SaleAnimal.SaleID = Sale.SaleID
+WHERE Category = 'Bird' AND
+	SaleDate BETWEEN '01/01/2007' AND '06/30/2007 23:59:59.59'
+ORDER BY SalePrice DESC;
+
+--Question 5
+SELECT TOP 1 WITH TIES Category, Breed, (SUM(SalePrice) + Sum(SalesTax)) AS TotalSales, AVG(SalePrice) AS AverageSalePrice
+FROM Animal 
+	JOIN SaleAnimal 
+		ON Animal.AnimalID = SaleAnimal.AnimalID
+	JOIN Sale
+		ON SaleAnimal.SaleID = Sale.SaleID
+WHERE Category = 'Dog' AND
+	SaleDate BETWEEN '01/01/2007' AND '06/30/2007 23:59:59.59'
+GROUP BY Category, Breed
+ORDER BY TotalSales DESC;

@@ -1,0 +1,21 @@
+--Drop table 'InvoiceLineItems'
+DROP TABLE InvoiceLineItems;
+
+--Drop table 'Invoices'
+DROP TABLE Invoices;
+
+--Drop table 'Vendors'
+DROP TABLE Vendors;
+
+--Drop table 'GlAccounts'
+DROP TABLE GLAccounts;
+
+--Drop table 'Terms'
+DROP TABLE Terms;
+
+
+
+
+
+
+

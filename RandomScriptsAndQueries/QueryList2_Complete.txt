@@ -1,0 +1,78 @@
+--QUERY LIST #2
+
+--1 --SELECT, FROM, JOIN, ON, WHERE, AND, BETWEEN, OR
+SELECT InvoiceNumber, InvoiceDate, VendorName, VendorState, InvoiceDate, InvoiceTotal
+FROM Invoices JOIN Vendors ON Invoices.VendorID = Vendors.VendorID
+WHERE (VendorState = 'CA'
+	AND InvoiceDate BETWEEN '02/01/12' AND '03/31/12 23:59:59')
+	OR InvoiceTotal > 1000.0000;
+
+--2 --SELECT, FROM, JOIN, ON, WHERE, NOT, IN, ORDER BY, DESC
+SELECT InvoiceNumber, InvoiceDate, VendorName, VendorState
+FROM Invoices JOIN Vendors
+ON Invoices.VendorID = Vendors.VendorID
+WHERE VendorState NOT IN ('CA', 'NV')
+ORDER BY VendorState, InvoiceDate DESC;
+
+--3
+SELECT MAX(InvoiceTotal) AS LargestInvoiceTotal
+FROM Invoices;
+
+--4
+SELECT SUM(InvoiceTotal) AS TotalInvoiceValue
+FROM Invoices;
+
+--5
+SELECT Invoices.VendorID, VendorName, SUM(InvoiceTotal) AS TotalValueOfInvoices
+FROM Vendors JOIN Invoices ON Vendors.VendorID = Invoices.VendorID
+GROUP BY Invoices.VendorID, VendorName
+ORDER BY TotalValueOfInvoices DESC;
+
+--6
+SELECT VendorName, VendorState, COUNT(InvoiceID) As TotalInvoices
+FROM Vendors JOIN Invoices ON Vendors.VendorID = Invoices.VendorID
+GROUP BY VendorName, VendorState
+HAVING COUNT(InvoiceID) >= 10
+ORDER BY VendorName;
+
+--7
+SELECT Vendors.VendorID, VendorName, AVG(InvoiceTotal) AS AvgInvoiceTotal
+FROM Vendors JOIN Invoices ON Vendors.VendorID = Invoices.VendorID
+GROUP BY Vendors.VendorID, VendorName
+HAVING AVG(InvoiceTotal) > 2000;
+
+--8--
+SELECT Vendors.VendorID, VendorName
+FROM Vendors LEFT JOIN Invoices ON Vendors.VendorID = Invoices.VendorID
+WHERE InvoiceID IS NULL;
+
+--Same thing as 8
+SELECT VendorID, VendorName
+FROM Vendors
+WHERE VendorID NOT IN
+	(SELECT VendorID
+	FROM Invoices);
+
+--9--
+SELECT COUNT(VendorID) AS NumbOfVendors
+FROM Invoices
+GROUP BY VendorID
+HAVING InvoiceDate > '01/01/2012';
+
+--10--
+
+
+--Multi-join example
+SELECT *
+FROM Vendors JOIN Invoices ON Vendors.VendorID = Invoices.VendorID
+	JOIN Terms ON Invoices.TermsID = Terms.TermsID
+	JOIN InvoiceLineItems ON Invoices.InvoiceID = InvoiceLineItems.InvoiceID
+	JOIN GLAccounts ON InvoiceLineItems.AccountNo = GLAccounts.AccountNo;
+
+--AVG with Subquery example
+SELECT InvoiceID, InvoiceTotal
+FROM Invoices
+WHERE InvoiceTotal >
+	(SELECT AVG(InvoiceTotal) As AvgOfInvoices
+	FROM Invoices)
+ORDER BY InvoiceTotal;

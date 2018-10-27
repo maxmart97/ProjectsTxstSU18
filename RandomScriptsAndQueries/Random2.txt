@@ -1,0 +1,169 @@
+
+
+--PART I SCRIPT BEGIN
+
+--Conditional DROP TABLE statements
+--GOs are used to separate batches/statements that must occur before the next
+--batch/statement can occur.
+IF OBJECT_ID('dbo.MaterialRequirements', 'U') IS NOT NULL
+DROP TABLE MaterialRequirements;
+
+GO
+
+IF OBJECT_ID('dbo.WorkOrderTask', 'U') IS NOT NULL
+DROP TABLE WorkOrderTask;
+
+GO
+
+IF OBJECT_ID('dbo.WorkOrder', 'U') IS NOT NULL
+DROP TABLE WorkOrder;
+
+GO
+
+IF OBJECT_ID('dbo.Project', 'U') IS NOT NULL
+DROP TABLE Project;
+
+GO
+
+IF OBJECT_ID('dbo.Task', 'U') IS NOT NULL
+DROP TABLE Task;
+
+IF OBJECT_ID('dbo.Material', 'U') IS NOT NULL
+DROP TABLE Material;
+
+IF OBJECT_ID('dbo.Customer', 'U') IS NOT NULL
+DROP TABLE Customer;
+
+GO
+
+--Create Tables
+--GOs are used to separate batches when the previous table(s) must exist before
+--the next batch executes.
+CREATE TABLE Customer
+	(CustID INT NOT NULL PRIMARY KEY,
+	CustName VARCHAR(50) NOT NULL,
+	CustIntCode VARCHAR(10) NULL,
+	CustAreaCode VARCHAR(10) NULL,
+	CustPhone VARCHAR(50) NULL,
+	CustWebAddress VARCHAR(250) NULL,
+	CustStAddress NVARCHAR(50) NULL, 
+	CustCity NVARCHAR(50) NULL, 
+	CustState NVARCHAR(5) NULL, 
+	CustZipCode VARCHAR(20) NULL, 
+	CustCountry VARCHAR(50) NULL, 
+	CustContactFName VARCHAR(50) NULL, 
+	CustContactLName VARCHAR(50) NULL, 
+	CustContactMName VARCHAR(50) NULL);
+
+CREATE TABLE Material
+	(MaterialID INT NOT NULL PRIMARY KEY,
+	MaterialName VARCHAR(50) NOT NULL,
+	MaterialDesc VARCHAR(500) NOT NULL,
+	UnitCost MONEY NOT NULL,
+	StockKeepingUnit INT NOT NULL);
+
+CREATE TABLE Task
+	(TaskID INT NOT NULL PRIMARY KEY,
+	TaskName VARCHAR(50) NOT NULL,
+	TaskDesc VARCHAR(500) NOT NULL,
+	EstimatedHours INT NULL,
+	HourlyRate MONEY NOT NULL);
+
+GO
+
+CREATE TABLE Project
+	(ProjectID INT NOT NULL PRIMARY KEY,
+	ProjectName VARCHAR(50) NOT NULL,
+	ProjectDesc VARCHAR(500) NOT NULL,
+	ProjectStartDate DATE NULL,
+	ProjectCompletionDate DATE NULL,
+	ProjectContractValue MONEY NULL,
+	ProjectStAddress NVARCHAR(50) NULL,
+	ProjectCity NVARCHAR(50) NULL,
+	ProjectState NVARCHAR(5) NULL,
+	ProjectZipCode VARCHAR(20) NULL,
+	ProjectCountry VARCHAR(50) NULL,
+	CustID INT NOT NULL REFERENCES Customer(CustID) ON UPDATE CASCADE);
+
+GO
+
+CREATE TABLE WorkOrder
+	(WONumber INT NOT NULL PRIMARY KEY,
+	WOCreationDate DATE NOT NULL, 
+	WOTargetCompletionDate DATE NOT NULL, 
+	WOActualCompletionDate DATE NULL,
+	ProjectID INT NOT NULL REFERENCES Project(ProjectID) ON UPDATE CASCADE);
+
+GO
+
+CREATE TABLE WorkOrderTask
+	(WorkOrderTaskID INT NOT NULL PRIMARY KEY,
+	WONumber INT NOT NULL REFERENCES WorkOrder(WONumber) ON UPDATE CASCADE,
+	TaskID INT NOT NULL REFERENCES Task(TaskID) ON UPDATE CASCADE,
+	WOTStatus VARCHAR(20) NOT NULL,
+	EstimatedHours INT NULL,
+	ActualHours INT NULL,
+	CompletionDate DATE NULL);
+
+GO
+
+CREATE TABLE MaterialRequirements
+	(MaterialID INT NOT NULL REFERENCES Material(MaterialID) ON UPDATE CASCADE,
+	WorkOrderTaskID INT NOT NULL REFERENCES WorkOrderTask(WorkOrderTaskID) ON UPDATE CASCADE,
+	EstimatedQuantity INT NOT NULL,
+	ActualQuantity INT NULL,
+	PRIMARY KEY (MaterialID, WorkOrderTaskID));
+
+GO
+
+--Begin data insertion
+--GOs are used to separate batches that require values from a previous batch
+
+--Insert data into tables that do not contain foreign key values
+INSERT INTO Customer
+	VALUES(1, 'Walmart', NULL, '512', '999-9999', 'www.walmart.com', '123 Walmart Road', 'San Marcos', 'TX', '78666', 'USA', 'John', 'Smith', 'M');
+INSERT INTO Customer
+	VALUES(2, 'Target', NULL, '512', '888-8888', 'www.target.com', '1234 Target Avenue', 'San Marcos', 'TX', '78666', 'USA', 'Robert', 'Paulson', 'M');
+	
+INSERT INTO Material
+	VALUES(1, 'Pavement', 'To be used in foundation and shaping of designated area', 30.0000, 5000);
+INSERT INTO Material
+	VALUES(2, 'Paint', 'To be used in painting traffic lines on designated area', 15.0000, 4000);
+	
+INSERT INTO TASK
+	VALUES(1, 'Pour pavement', 'Workers must pour the pavement for the designated area', 10, 400.0000);
+INSERT INTO TASK
+	VALUES(2, 'Paint traffic lines', 'Workers must paint all applicable traffic lines for the designated area', 3, 100.0000);
+
+GO
+
+--Insert data into tables that contain foreign key values
+INSERT INTO Project
+	VALUES(1, 'Walmart Parking Lot', 'Pave Walmart parking lot and paint traffic lines', '06/28/2018', NULL, 30000.0000, '123 Walmart Road', 'San Marcos', 'TX', '78666', 'USA', 1);
+INSERT INTO Project
+	VALUES(2, 'Target Parking Lot', 'Pave Target parking lot and paint traffic lines', '06/30/2018', NULL, 20000.0000, '124 Target Avenue', 'San Marcos', 'TX', '78666', 'USA', 2);
+
+GO
+
+INSERT INTO WorkOrder
+	VALUES(1, '06/28/2018', '07/30/2018', NULL, 1)
+INSERT INTO WorkOrder
+	VALUES(2, '06/30/2018', '07/25/2018', NULL, 2)
+
+GO
+
+INSERT INTO WorkOrderTask
+	VALUES(1, 1, 1, 'NOT STARTED', 160, NULL, NULL);
+INSERT INTO WorkOrderTask
+	VALUES(2, 2, 1, 'NOT STARTED', 140, NULL, NULL);
+
+GO
+	
+INSERT INTO MaterialRequirements
+	VALUES(1, 1, 100, NULL);
+INSERT INTO MaterialRequirements
+	VALUES(2, 2, 80, NULL);
+
+GO
+
+--PART I SCRIPT END

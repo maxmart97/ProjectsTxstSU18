@@ -1,0 +1,50 @@
+--Set current database
+Use xxxxx;
+
+--Create table 'Terms'
+CREATE TABLE Terms
+(TermsID INT PRIMARY KEY NOT NULL,
+TermsDescription VARCHAR(50) NOT NULL,
+TermsDueDays SMALLINT NOT NULL);
+
+--Create table 'GLAccounts'
+CREATE TABLE GLAccounts
+(AccountNo INT PRIMARY KEY NOT NULL,
+AccountDescription VARCHAR(50) NOT NULL);
+
+--Create table 'Vendors'
+CREATE TABLE Vendors
+(VendorID INT PRIMARY KEY NOT NULL IDENTITY,
+VendorName VARCHAR(50) NOT NULL,
+VendorAddress1 VARCHAR(50) NULL,
+VendorAddress2 VARCHAR(50) NULL,
+VendorCity VARCHAR(50) NOT NULL,
+VendorState CHAR(2) NOT NULL,
+VendorZipCode VARCHAR(20) NOT NULL,
+VendorPhone VARCHAR(50) NULL,
+VendorContactLName VARCHAR(50) NULL,
+VendorContactFName VARCHAR(50) NULL,
+DefaultTermsID INT NOT NULL REFERENCES Terms(TermsID) ON UPDATE CASCADE,
+DefaultAccountNo INT NOT NULL REFERENCES GLAccounts(AccountNo));
+
+--Create table 'Invoices'
+CREATE TABLE Invoices
+(InvoiceID INT PRIMARY KEY NOT NULL IDENTITY,
+VendorID INT NOT NULL REFERENCES Vendors(VendorID) ON UPDATE CASCADE,
+InvoiceNumber VARCHAR(50) NOT NULL,
+InvoiceDate SMALLDATETIME NOT NULL,
+InvoiceTotal MONEY NOT NULL,
+PaymentTotal MONEY NOT NULL DEFAULT 0 CHECK(PaymentTotal >= 0),
+CreditTotal MONEY NOT NULL DEFAULT 0,
+TermsID INT NOT NULL REFERENCES Terms(TermsID),
+InvoiceDueDate SMALLDATETIME NOT NULL,
+PaymentDate SMALLDATETIME NULL);
+
+--Create Table 'InvoiceLineItems'
+CREATE TABLE InvoiceLineItems
+(InvoiceID INT NOT NULL REFERENCES Invoices(InvoiceID),
+InvoiceSequence SMALLINT NOT NULL,
+AccountNo INT NOT NULL REFERENCES GLAccounts(AccountNo),
+InvoiceLineItemAmount MONEY NOT NULL CHECK(InvoiceLineItemAmount >= 0),
+InvoiceLineItemDescription VARCHAR(100) NOT NULL,
+PRIMARY KEY(InvoiceID, InvoiceSequence));

@@ -1,0 +1,58 @@
+SELECT *
+FROM Vendors, Invoices, InvoiceLineItems
+WHERE Vendors.VendorID = Invoices.VendorID
+AND Invoices.InvoiceID = InvoiceLineItems.InvoiceID;
+
+SELECT *
+FROM Vendors
+	JOIN Invoices
+		ON Vendors.VendorID = Invoices.VendorID
+	JOIN InvoiceLineItems
+		ON Invoices.InvoiceID = InvoiceLineItems.InvoiceID;
+
+--Query List #3
+
+--1
+SELECT InvoiceID, InvoiceDate, InvoiceTotal
+FROM Invoices
+WHERE InvoiceDate BETWEEN '03/01/2012' AND '03/31/2012 23:59:59'
+AND InvoiceTotal >
+	(SELECT AVG(InvoiceTotal)
+	FROM Invoices)
+ORDER BY InvoiceTotal;
+
+--2
+SELECT VendorName, InvoiceNumber, InvoiceTotal
+FROM Vendors 
+	JOIN Invoices 
+		ON Vendors.VendorID = Invoices.VendorID
+WHERE InvoiceTotal >
+	(SELECT MAX(InvoiceTotal)
+	FROM Invoices
+	WHERE VendorID = 34)
+ORDER BY VendorName;
+
+--3
+SELECT Invoices.VendorID, InvoiceNumber, InvoiceTotal
+FROM Invoices 
+	JOIN
+		(SELECT VendorID, AVG(InvoiceTotal) AS AvgInvTotalPerVendor
+		FROM Invoices
+		GROUP BY VendorID) AS VendInvAvg 
+				ON Invoices.VendorID = VendInvAvg.VendorID
+WHERE InvoiceTotal > AvgInvTotalPerVendor
+ORDER BY Invoices.VendorID, InvoiceTotal;
+
+--4
+SELECT *
+FROM Vendors
+WHERE VendorID NOT IN
+	(SELECT DISTINCT VendorID
+	FROM Invoices);
+
+--Another way to do a conditional drop statement
+IF EXISTS
+(SELECT *
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_NAME = 'Test' AND TABLE_SCHEMA = 'dbo')
+DROP TABLE dbo.Test;

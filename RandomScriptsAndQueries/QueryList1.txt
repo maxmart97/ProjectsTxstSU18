@@ -1,0 +1,61 @@
+--QUERY LIST #1
+
+--1 --SELECT, FROM
+SELECT InvoiceID, InvoiceNumber, InvoiceTotal
+FROM Invoices;
+
+--2 --SELECT, AS, FROM, ORDER BY
+SELECT InvoiceID, InvoiceNumber, InvoiceTotal, (CreditTotal + PaymentTotal) AS TotalCredits
+FROM Invoices
+ORDER BY InvoiceTotal;
+
+--3 --SELECT, AS, FROM, WHERE, =
+SELECT InvoiceID, InvoiceNumber, InvoiceTotal, (CreditTotal + PaymentTotal) AS TotalCredits
+FROM Invoices
+WHERE InvoiceId = 17;
+
+--4 --SELECT, AS, FROM, WHERE, BETWEEN, AND, ORDER BY
+SELECT InvoiceID, InvoiceNumber, InvoiceTotal, (CreditTotal + PaymentTotal) AS TotalCredits, InvoiceDate
+FROM Invoices
+WHERE InvoiceDate BETWEEN '03/01/2012' AND '03/31/2012 11:59:59'
+ORDER BY InvoiceDate;
+
+--5 --SELECT, AS, FROM, WHERE, >
+SELECT InvoiceID, InvoiceNumber, InvoiceTotal, (CreditTotal + PaymentTotal) AS TotalCredits
+FROM Invoices
+WHERE InvoiceTotal > 5000;
+
+--6 --SELECT, TOP, WITH TIES, AS, FROM, ORDER BY, DESC
+SELECT TOP 1 WITH TIES InvoiceID, InvoiceNumber, InvoiceTotal AS MaxInvoiceTotal, (CreditTotal + PaymentTotal) AS TotalCredits
+FROM Invoices
+ORDER BY InvoiceTotal DESC;
+
+--7 --SELECT, DATEDIFF(interval, starting_date datetime, ending_date datetime), AS, FROM
+SELECT InvoiceNumber, InvoiceDate, DATEDIFF(day, InvoiceDate, GETDATE()) AS InvoiceAge
+FROM Invoices
+ORDER BY InvoiceAge;
+
+--8 --SELECT, AS, LEFT(expression, number_of_chars), FROM 
+SELECT VendorID, VendorName, VendorContactLName + ', ' + VendorContactFName AS ContactName, LEFT(VendorContactFName, 1)
+	+ LEFT(VendorContactLName, 1) AS ContactInitials
+FROM Vendors;
+
+--9 --SELECT, DISTINCT, FROM, ORDER BY
+SELECT DISTINCT VendorCity, VendorState
+FROM Vendors
+ORDER BY VendorState, VendorCity;
+
+--10 --SELECT, FROM, WHERE, IN
+SELECT VendorID, VendorName, VendorCity, VendorState
+FROM Vendors
+WHERE VendorState IN ('CA', 'OH');
+
+
+--QUERY LIST #2
+
+--2 --SELECT, FROM, JOIN, ON, WHERE, NOT, IN, ORDER BY, DESC
+SELECT InvoiceNumber, InvoiceDate, VendorName, VendorState
+FROM Invoices JOIN Vendors
+ON Invoices.VendorID = Vendors.VendorID
+WHERE VendorState NOT IN ('CA', 'NV')
+ORDER BY VendorState, InvoiceDate DESC;
